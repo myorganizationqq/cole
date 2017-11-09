@@ -1,3 +1,4 @@
+
 CREATE TABLE `logs` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL COMMENT '用户帐号',
