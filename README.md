@@ -10,9 +10,11 @@
 
 ####提交代码流程
 - git status 查看更改状态
-- git add 添加更改文件
+- git add filename 添加更改文件
 - git commit -m 'comments' 提交到本地
-- git push 发不到远程仓库
+- git push 发布到远程仓库
 		
 		
 - fengzhihui
+
+#over
