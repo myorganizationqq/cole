@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.web.dao.demo.DynamicSqlMapper">	
+    <select id="executeSelectSql"  resultType="java.util.HashMap">
+       ${sqlDynamicStatement}
+    </select>
+   <select id="executeSelectListPage"  resultType="java.util.HashMap">
+       ${sqlDynamicStatement}
+    </select>
+</mapper>

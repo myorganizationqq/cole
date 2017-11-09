@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.web.dao.authorization.ResourceMapper">
+	<sql id="Resource_Column_List">
+        r.resid,r.name,r.url,r.parentid,r.operate,r.layer,r.ord,r.display,r.iconclass,r.recordlog,r.target,r.createtime,r.description
+    </sql>
+	<select id="findResourceByUid" parameterType="java.lang.Long"
+		resultType="com.cole.project.web.entity.Resource">
+		select
+		<include refid="Resource_Column_List"></include>		
+		from resource r
+		where r.resid in (
+		select rr.resid from role_resource rr where
+		rr.rid in
+		(select
+		rl .rid
+		from role rl
+		inner join user_role ur on ur.uid= #{id} and ur.rid=rl .rid
+		)
+		)
+		order by layer asc,ord asc
+	</select>
+	<select id="findALLResource" resultType="com.cole.project.web.entity.Resource">
+        select
+        <include refid="Resource_Column_List"></include>
+		from resource r
+        order by layer asc,ord asc
+    </select>
+    <insert id="insertResource" useGeneratedKeys="true" keyProperty="resid" parameterType="com.cole.project.web.entity.Resource">		
+		insert into resource 
+		(name,url,parentid,operate,layer,ord,display,iconclass,recordlog,target,createtime,description)
+		values 
+		(#{name},#{url},#{parentid},#{operate},#{layer},#{ord},#{display},#{iconclass},#{recordlog},#{target},#{createtime},#{description})	
+	</insert>
+	<update id="updateResourceByResid" parameterType="com.cole.project.web.entity.Resource">
+		update resource
+		set name=#{name},
+			url=#{url},
+			operate=#{operate},
+			ord=#{ord},
+			display=#{display},
+			iconclass=#{iconclass},
+			recordlog=#{recordlog},
+			target=#{target},
+			description=#{description}
+		where resid = #{resid}
+	</update>
+	<delete id="deleteResourceByResid" parameterType="java.lang.Long">
+		delete from
+		resource
+		where resid = #{resid}
+	</delete>
+</mapper>

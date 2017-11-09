@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.web.dao.authorization.RoleMapper">	
+	<select id="findRolesByUid"  parameterType="java.lang.Long" resultType="com.cole.project.web.entity.Role">
+		select
+		r.rid,r.name,r.rolecode,r.createtime,r.description
+		from role r 
+		inner join user_role ur on ur.uid= #{id} and ur.rid=r.rid
+	</select>	
+	<select id="getRoleByResid" parameterType="java.lang.Long"  resultType="java.util.HashMap">
+		select r.name,r.rid
+		from role r 
+		inner join role_resource rr 
+		on r.rid = rr.rid 
+		where resid=#{resid}
+	</select>
+	<select id="getRoleByRid" parameterType="java.lang.Long"  resultType="com.cole.project.web.entity.Role">
+		select
+		r.rid,r.name,r.rolecode,r.createtime,r.description
+		from role r 
+		where rid=#{rid}
+	</select>
+	<select id="findALLRoles" resultType="com.cole.project.web.entity.Role">
+		select
+		r.rid,r.name,r.rolecode,r.createtime,r.description
+		from role r 
+		order by rid 
+	</select>
+	<insert id="insertRoleResource" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.Map">
+		insert into
+		role_resource (rid, resid)
+		values
+		(#{rid},#{resid})
+	</insert>
+	<delete id="deleteRoleResource" parameterType="java.lang.Long">
+		delete from
+		role_resource
+		where resid = #{resid}
+	</delete>	
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd"
+	default-lazy-init="true">
+    <!-- validate code -->
+    <bean id="validateCode" class="com.cole.web.shiro.jcaptcha.ValidateCode">
+        <property name="imageService" ref="imageService"/>
+    </bean>
+    <bean id="imageService" class="com.octo.captcha.service.image.DefaultManageableImageCaptchaService">
+        <constructor-arg ref="imgStore"></constructor-arg>
+        <constructor-arg ref="imgEngine"></constructor-arg>
+        <constructor-arg value="180"></constructor-arg>
+        <constructor-arg value="100000"></constructor-arg>
+        <constructor-arg value="75000"></constructor-arg>
+    </bean>
+    <bean id="imgStore" class="com.octo.captcha.service.captchastore.FastHashMapCaptchaStore"/>
+    <bean id="imgEngine" class="com.octo.captcha.engine.GenericCaptchaEngine">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="CaptchaFactory"/>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean id="CaptchaFactory" class="com.cole.web.shiro.jcaptcha.IgnoreCaseGimpyFactory">
+        <constructor-arg>
+            <ref bean="wordGen"/>
+        </constructor-arg>
+        <constructor-arg>
+            <ref bean="word2Image"/>
+        </constructor-arg>
+        <constructor-arg value="false"/>
+    </bean>
+    <bean id="wordGen" class="com.octo.captcha.component.word.wordgenerator.DictionaryWordGenerator">
+        <constructor-arg>
+            <ref bean="fileDict"/>
+        </constructor-arg>
+    </bean>
+    <bean id="word2Image" class="com.octo.captcha.component.image.wordtoimage.ComposedWordToImage">
+        <constructor-arg index="0">
+            <ref bean="fontGenRandom"/>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="backGenUni"/>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <ref bean="simpleWhitePaster"/>
+        </constructor-arg>
+    </bean>
+    <bean id="fileDict" class="com.octo.captcha.component.word.FileDictionary">
+        <constructor-arg index="0">
+            <value>toddlist</value>
+        </constructor-arg>
+    </bean>
+    <bean id="fontRoman" class="java.awt.Font">
+        <constructor-arg index="0">
+            <value>Tahoma</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value>1</value>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <value>1</value>
+        </constructor-arg>
+    </bean>
+    <bean id="fontGenRandom" class="com.octo.captcha.component.image.fontgenerator.RandomFontGenerator">
+        <constructor-arg index="0">
+            <value>20</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value>20</value>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <list>
+                <ref bean="fontRoman"/>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean id="backGenUni" class="com.octo.captcha.component.image.backgroundgenerator.UniColorBackgroundGenerator">
+        <constructor-arg index="0">
+            <value>70</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value>28</value>
+        </constructor-arg>
+    </bean>
+    <bean id="simpleWhitePaster" class="com.octo.captcha.component.image.textpaster.SimpleTextPaster">
+        <constructor-arg type="java.lang.Integer" index="0">
+            <value>4</value>
+        </constructor-arg>
+        <constructor-arg type="java.lang.Integer" index="1">
+            <value>4</value>
+        </constructor-arg>
+        <constructor-arg type="java.awt.Color" index="2">
+            <ref bean="colorGreen"/>
+        </constructor-arg>
+    </bean>
+    <bean id="colorGreen" class="java.awt.Color">
+        <constructor-arg index="0" type="int">
+            <value>0</value>
+        </constructor-arg>
+        <constructor-arg index="1" type="int">
+            <value>51</value>
+        </constructor-arg>
+        <constructor-arg index="2" type="int">
+            <value>153</value>
+        </constructor-arg>
+    </bean>
+</beans>

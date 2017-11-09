@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.web.dao.authorization.UserMapper">
+	<sql id="Base_Column_List">
+		uid,username,userpwd,fullname,seccode,usericon,gender,mobile,email,weixinid,userstatus,
+		visitcount,lastvisit,regtime,updatetime
+	</sql>
+	<select id='findUserByUid' parameterType="java.lang.Long" resultType="com.cole.project.web.entity.User">
+		select 
+			<include refid="Base_Column_List" /> 
+		from user 
+		where uid = #{uid}
+	</select>
+	<select id="findUserByUsername" parameterType="java.lang.String" resultType="com.cole.project.web.entity.User">
+		select 
+			<include refid="Base_Column_List" /> 
+		from user 
+		where username = #{username}
+	</select>	
+	<update id="enableUserByUid" parameterType="java.lang.Long">
+		update user
+		set
+		userstatus = 0
+		where uid = #{uid}
+	</update>
+	<update id="disableUserByUid" parameterType="java.lang.Long">
+		update user
+		set
+		userstatus = 1
+		where uid = #{uid}
+	</update>
+	<update id="lockUserByUsername" parameterType="java.lang.String">
+		update user
+		set
+		userstatus = 2
+		where username = #{username}
+	</update>
+	<insert id="addUser" keyProperty="uid" useGeneratedKeys="true" parameterType="com.cole.project.web.entity.User">
+    	insert into user (username,userpwd,fullname,seccode,usericon,gender,mobile,
+    		email,weixinid,userstatus,visitcount,lastvisit,regtime,updatetime)
+    	values (#{username},#{userpwd},#{fullname},#{seccode},#{usericon},#{gender},#{mobile},
+    		#{email},#{weixinid},#{userstatus},#{visitcount},#{lastvisit},#{regtime},#{updatetime})
+  	</insert>	
+  	 <delete id="deleteUserByUid" parameterType="java.lang.Long">
+	    delete from user
+	    where uid = #{uid}
+	 </delete>
+	 <update id="updateUserPasswordByUid">
+        update user
+        set
+        userpwd = #{userpwd},
+        updatetime=#{updatetime}
+        where uid = #{uid}
+    </update>
+    <update id="updateUserByUid" parameterType="com.cole.project.web.entity.User">
+        update user
+        set 
+	        username = #{username},
+	        <if test="userpwd != null">
+	        userpwd = #{userpwd},
+	         </if>
+	        fullname = #{fullname}
+	        usericon = #{usericon},
+	        gender = #{gender},
+	        mobile = #{mobile},
+    		email = #{email},
+    		weixinid = #{weixinid},
+    		userstatus = #{userstatus},
+    		updatetime = #{updatetime}
+        where uid = #{uid}
+    </update>
+    <select id="findUserListPage"  resultType="com.cole.project.web.entity.User">
+        select
+        	uid,username,fullname,usericon,gender,mobile,email,weixinid,userstatus,
+        	visitcount,lastvisit,regtime,updatetime
+        from user
+        <where>
+            <if test="username != null">
+                and username like #{username}
+            </if>
+            <if test="fullname != null">
+                and fullname like #{fullname} 
+            </if>
+            <if test="startTime != null">
+                and regtime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and regtime &lt;= #{endTime}
+            </if>
+             <if test="rid != null and rid &gt; 0">
+                and uid in (select uid from user_role where rid=#{rid})
+            </if>
+        </where>
+        order by updatetime desc
+    </select>
+   
+</mapper>

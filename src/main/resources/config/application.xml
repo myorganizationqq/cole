@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/task  http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+	<tx:annotation-driven />	
+	<!-- 加载配置文件 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	<context:component-scan base-package="com.cole.project.web.service,com.cole.project.web.dao" />
+	<!-- 数据源 -->
+	<bean id="commonDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${cole.driverClassName}"></property>
+		<property name="url" value="${cole.url}"></property>
+		<property name="username" value="${cole.username}"></property>
+		<property name="password" value="${cole.password}"></property>
+		<property name="minIdle" value="${dbcp.minIdle}"></property>
+		<property name="maxIdle" value="${dbcp.maxIdle}"></property>
+		<property name="initialSize" value="${dbcp.initialSize}"></property>
+		<property name="maxActive" value="${dbcp.maxActive}"></property>
+		<property name='removeAbandoned' value='${dbcp.removeAbandoned}'></property>
+		<property name='removeAbandonedTimeout' value='${dbcp.removeAbandonedTimeout}'></property>
+		<property name='maxWait' value='${dbcp.maxWait}'></property>
+		<property name="testWhileIdle" value="${dbcp.testWhileIdle}" />
+		<property name="testOnBorrow" value="${dbcp.testOnBorrow}" />
+		<property name="testOnReturn" value="${dbcp.testOnReturn}" />
+		<property name="validationQuery" value="${dbcp.validationQuery}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${dbcp.timeBetweenEvictionRunsMillis}" />
+		<property name="numTestsPerEvictionRun" value="${dbcp.numTestsPerEvictionRun}" />
+		<property name="minEvictableIdleTimeMillis" value="${dbcp.minEvictableIdleTimeMillis}" />
+	</bean>
+	<bean id="commonTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="commonDataSource" />
+		<qualifier value="common"/>
+	</bean>
+	<!-- 加载Mapper文件 -->
+	<bean id="commonSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="commonDataSource" />
+		<!--property name="mapperLocations" value="classpath:mapper/**/*.xml" /-->
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mapper/authorization/*.xml</value>
+				<value>classpath:mapper/demo/*.xml</value>
+			</array>			
+		</property>
+		<property name="configLocation" value="classpath:config/mybatis.xml" />
+	</bean>
+	<!-- Mapper和DAO对象映射 -->
+	<bean id="commonMapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.cole.project.web.dao" />
+		<property name="sqlSessionFactoryBeanName" value="commonSqlSessionFactory" />
+	</bean>
+	<!-- 支持redis和ehcache两种方式，对应配置文件不同 -->
+ 	<import resource="classpath:config/spring-shiro-ehcache.xml"/>
+</beans>

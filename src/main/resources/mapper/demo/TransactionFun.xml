@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.web.dao.demo.TransactionFunMapper">	
+    <select id="findTransactionFun"  resultType="java.util.HashMap">
+        select
+			stat_begin_tm as 'time',
+        	round((sum(execute_time)/sum(execute_num)),2) as 'y',
+        	sum(execute_num) as 'total',
+        	max(execute_time_max) as 'max',
+        	min(execute_time_min) as 'min'
+        from application_transaction_func_stat_minute     
+        where
+        	stat_begin_tm &gt;= #{startTime}       
+            and stat_begin_tm &lt; #{endTime}     
+        group by stat_begin_tm
+        order by stat_begin_tm asc 
+    </select>
+   
+</mapper>

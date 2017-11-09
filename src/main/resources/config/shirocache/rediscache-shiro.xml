@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<redis>
+	<cache name="default" db="1" timeout=""></cache>
+    <!-- 授权缓存 -->
+    <cache name="shiro-authorizationCache" db="2" timeout=""></cache>
+    <!-- 认证缓存 -->
+    <cache name="shiro-authenticationCache" db="3" timeout=""></cache> 
+    <!-- 登录会话 -->
+	<cache name="shiro-session" db="4"></cache>
+	<!-- 踢出会话 -->
+	<cache name="shiro-kickUser-session" db="5" timeout=""></cache>
+	<!-- 登录次数限制 -->
+	<cache name="shiro-login-count" db="6" timeout=""></cache>
+</redis>

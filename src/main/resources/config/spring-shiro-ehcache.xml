@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd"
+	default-lazy-init="true">
+	<description>Shiro安全配置</description>
+	<!-- 验证码 -->
+	<import resource="classpath:config/spring-jcaptcha.xml"/>	
+	<!-- 項目自定义的Realm, 所有依赖的dao都需要用depends-on声明-->
+	<bean id="roleService"  class="com.cole.project.web.service.authorization.RoleService"/>
+	<bean id="userService" class="com.cole.project.web.service.authorization.UserService"/>
+	<bean id="resourceService"  class="com.cole.project.web.service.authorization.ResourceService"/>
+	<bean id="logsService"  class="com.cole.project.web.service.authorization.LogsService"/>	 
+	<bean id="shiroDbRealm" class="com.cole.project.shiro.realm.ShiroDbRealm">
+		<!-- property name="cachingEnabled" value="true" />
+		<property name="authenticationCachingEnabled" value="true" />
+		<property name="authenticationCacheName" value="shiro-authenticationCache" />
+		<property name="authorizationCachingEnabled" value="true" />
+		<property name="authorizationCacheName" value="shiro-authorizationCache" /-->
+		<property name="roleService" ref="roleService" />
+		<property name="userService" ref="userService" />
+		<property name="resourceService" ref="resourceService" />
+	</bean>	
+	<bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManagerConfigFile"
+			value="classpath:config/shirocache/ehcache-shiro.xml" />
+	</bean>
+	<!--session管理 -->
+	<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg value="sid" />
+		<property name="httpOnly" value="true" />
+		<property name="path" value="/"/>
+	</bean>
+	<bean id="sessionManager"
+		class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="sessionIdUrlRewritingEnabled" value="false" />
+		<property name="globalSessionTimeout" value="1800000" />
+		<property name="deleteInvalidSessions" value="true" />
+		<property name="sessionValidationSchedulerEnabled" value="true" />
+		<property name="sessionIdCookieEnabled" value="true" />
+		<property name="sessionIdCookie" ref="sessionIdCookie" />
+	</bean>
+	<!-- 记住我Cookies -->
+	<bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg value="rememberMe" />
+		<property name="httpOnly" value="true" />
+		<!-- 一个月 -->
+		<property name="maxAge" value="2592000" />
+	</bean>
+	<bean id="remeberManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+		<property name="cookie" ref="rememberMeCookie" />
+	</bean>
+	<!-- Shiro默认会使用Servlet容器的Session,可通过sessionMode属性来指定使用Shiro原生Session -->
+	<!-- 即<property name="sessionMode" value="native"/>,详细说明见官方文档 -->
+	<!-- 这里主要是设置自定义的单Realm应用,若有多个Realm,可使用'realms'属性代替 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="shiroDbRealm" />
+		<property name="cacheManager" ref="shiroEhcacheManager" />
+		<property name="sessionManager" ref="sessionManager" />
+	</bean>
+	 <!-- 用户同时多次登录控制 -->
+    <bean id="kickUser" class="com.cole.project.shiro.filter.KickUser" init-method="init">
+        <property name="maxSession" value="1"/>
+        <property name="kickBefore" value="true"/>
+        <property name="cacheManager" ref="shiroEhcacheManager"/>
+        <property name="sessionManager" ref="sessionManager"/>
+        <property name="cacheName" value="shiro-kickUser-session"/>
+    </bean>
+     <!-- 登录失败处理 -->
+    <bean id="preventCracking" class="com.cole.project.shiro.filter.PreventCrackingByEhCache">
+        <property name="cacheManager" ref="shiroEhcacheManager"/>
+        <property name="userService" ref="userService" />
+        <property name="failureCount" value="5"/>
+        <property name="cacheName" value="shiro-login-count"/>
+    </bean>     
+	<bean id="loginFormAuthenticationFilter" class="com.cole.project.shiro.filter.LoginFormAuthenticationFilter">
+		<property name="usernameParam" value="username" />
+		<property name="passwordParam" value="password" />
+		<property name="kickUser" ref="kickUser"/>
+        <property name="preventCracking" ref="preventCracking"/>
+        <property name="logsService" ref="logsService"/>
+	</bean>
+	<!-- 用户剔出会话过滤 -->
+	<bean id="kickSessionFilter" class="com.cole.project.shiro.filter.KickSessionFilter">
+        <property name="kickUser" ref="kickUser"/>
+        <property name="loginFormAuthenticationFilter" ref="loginFormAuthenticationFilter"/>
+    </bean>  
+	<bean id="requireLoginFilter" class="com.cole.project.shiro.filter.RequireLoginFilter">
+	</bean>
+	<bean id="resourceAccessFilter" class="com.cole.project.shiro.filter.ResourceAccessFilter">
+	<property name="resourceService" ref="resourceService" />
+	<property name="userService" ref="userService" />
+	</bean>
+	<bean id="logoutFilter" class="com.cole.project.shiro.filter.LogoutFilter">
+		<property name="redirectUrl" value="/login" />
+	</bean>
+	<!-- Shiro主过滤器本身功能十分强大,其强大之处就在于它支持任何基于URL路径表达式的、自定义的过滤器的执行 -->
+	<!-- Web应用中,Shiro可控制的Web请求必须经过Shiro主过滤器的拦截,Shiro对基于Spring的Web应用提供了完美的支持 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- Shiro的核心安全接口,这个属性是必须的 -->
+		<property name="securityManager" ref="securityManager" />
+		<!-- 要求登录时的链接(可根据项目的URL进行替换),非必须的属性,默认会自动寻找Web工程根目录下的"/login.jsp"页面 -->
+		<property name="loginUrl" value="/login" />
+		<!-- 登录成功后要跳转的连接 -->
+		<property name="successUrl" value="/index" />
+		<!-- 用户访问未对其授权的资源时,所显示的连接 -->
+		<!-- 若想更明显的测试此属性可以修改它的值,如unauthor.jsp -->
+		<property name="unauthorizedUrl" value="/" />
+		<property name="filters">
+			<map>
+				<entry key="authc" value-ref="loginFormAuthenticationFilter" />
+                <entry key="kick" value-ref="kickSessionFilter"/>
+				<entry key="menu" value-ref="resourceAccessFilter" />
+				<entry key="imgCode" value-ref="validateCode"/>
+				<entry key="requireLogin" value-ref="requireLoginFilter" />
+				<entry key="logout" value-ref="logoutFilter" />
+			</map>
+		</property>
+		<!-- Shiro连接约束配置,即过滤链的定义 /**= kick,requireLogin,menu -->
+		<!-- 下面value值的第一个'/'代表的路径是相对于HttpServletRequest.getContextPath()的值来的 -->
+		<!-- anon：它对应的过滤器里面是空的,什么都没做,这里.do和.jsp后面的*表示参数,比方说login.jsp?main这种 -->
+		<!-- authc：该过滤器下的页面必须验证后才能访问,它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter -->
+		<property name="filterChainDefinitions">
+			<value>
+				/ = anon
+				/resources/** = anon
+				/privilege/** = anon
+				/unauthorized = anon
+				/error = anon
+				/captcher = anon
+				/login** = imgCode,authc
+				/logout = logout
+				/** = kick,requireLogin,menu
+			</value>
+		</property>
+	</bean>
+	<!-- kick,requireLogin,menu -->
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<!-- 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions),需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证 -->
+	<!-- 配置以下两个bean即可实现此功能 -->
+	<!-- Enable Shiro Annotations for Spring-configured beans. Only run after 
+		the lifecycleBeanProcessor has run -->
+	<!-- 由于本例中并未使用Shiro注解,故注释掉这两个bean(个人觉得将权限通过注解的方式硬编码在程序中,查看起来不是很方便,没必要使用) -->
+	<!-- <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" 
+		depends-on="lifecycleBeanPostProcessor"/> <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor"> 
+		<property name="securityManager" ref="securityManager"/> </bean> -->
+</beans>
