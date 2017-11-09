@@ -8,4 +8,4 @@ CREATE TABLE `logs` (
   `url` varchar(1024) DEFAULT NULL COMMENT '发生源',
   `createtime` datetime NOT NULL COMMENT '记录时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='操作日志';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='操作日志表';
