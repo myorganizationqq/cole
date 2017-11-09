@@ -8,10 +8,9 @@
 若是菜单栏目下其它页面，但没有单独的菜单的话，必须结构在上级菜单下，配置信息必须是：不显示和目标页面
 其它接口或者ajax类的，配置为：不显示和目标页面，没有约束必须在显示菜单下，但为统一管理，建议放到一起
 
-git status 
-git add 
-git commit
-
-
-git
+####提交代码流程
+- git status 查看更改状态
+- git add 添加更改文件
+- git commit -m 'comments' 提交到本地
+- git push 发不到远程仓库
 		
