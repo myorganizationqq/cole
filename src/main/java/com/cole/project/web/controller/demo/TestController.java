@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cole.project.web.service.demo.TransactionFunService;
 import com.cole.web.bean.AjaxResult;
+import redis.clients.jedis.Jedis;
 
 @Controller
 public class TestController {
@@ -34,6 +35,9 @@ public class TestController {
 		return TransactionFunService.findTransactionFun(startTime, endTime);
 	}
 
-	 
+	public static void main(String[] args) {
+		Jedis j = new Jedis("104.225.152.150",6379);
+		j.append("a","abc");
+	}
 
 }
