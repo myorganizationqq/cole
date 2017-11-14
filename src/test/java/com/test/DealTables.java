@@ -10,8 +10,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cole.project.data.common.OracleConn;
-
 public class DealTables {
 	private static Connection conn;
 	private static PreparedStatement ps;
@@ -20,24 +18,6 @@ public class DealTables {
 	static StringBuilder sbd = new StringBuilder();
 	
 	public static void main(String[] args) throws IOException {
-		testOracle();
-	}
-	
-	public static void testOracle() {
-		String sql = "SELECT * FROM CM_LOG_RECV_SEND";
-		conn = OracleConn.getInstance().getConnection();
-		try {
-			ps = conn.prepareStatement(sql);
-	        rs = ps.executeQuery();
-	        while(rs.next()) {
-	        	String waterNo = rs.getString("WATER_NO");
-	        	System.out.println(waterNo);
-	        }
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			OracleConn.releaseAll();
-		}
 	}
 	
 	public static void dealTables() throws IOException {
