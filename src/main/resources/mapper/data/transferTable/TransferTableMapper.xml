@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.data.transferTable.dao.TransferTableDao" >
+  
+  <insert id="insert" parameterType="com.cole.project.data.transferTable.model.TransferTableEntity" >
+    insert into transfer_table (IMP_TABLE_NAME,EXP_TABLE_NAME,TABLE_COLUMN,SQL,STAT)
+    values (#{impTableName}, #{expTableName}, #{tableColumn},#{sql}, #{stat}
+      )
+  </insert>
+ 
+
+<select id="getList" parameterType="java.util.Map" resultType="com.cole.project.data.transferTable.model.TransferTableEntity">
+	select IMP_TABLE_NAME impTableName,EXP_TABLE_NAME expTableName,TABLE_COLUMN tableColumn,EXTRA_SQL extraSql,STAT stat from transfer_table
+	<where>
+		<if test="impTableName != null">
+			and IMP_TABLE_NAME like CONCAT('%',#{impTableName},'%')
+		</if>
+		<if test="expTableName != null">
+			and EXP_TABLE_NAME like CONCAT('%',#{expTableName},'%')
+		</if>
+		<if test="stat != null">
+			and stat = #{stat}
+		</if>
+	</where>
+	order by IMP_TABLE_NAME
+</select>
+</mapper>
