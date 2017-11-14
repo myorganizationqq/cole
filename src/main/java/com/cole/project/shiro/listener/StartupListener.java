@@ -42,7 +42,7 @@ public class StartupListener extends ContextLoaderListener implements Applicatio
         }
         //传输表数据的定时任务
         ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(10,new BasicThreadFactory.Builder().namingPattern("TransferTable-schedule-pool-%d").daemon(true).build());
-        scheduledExecutorService.scheduleAtFixedRate(new TransferTableExecutor("TransferTableJob",oAC),10,24*60*60,TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleAtFixedRate(new TransferTableExecutor("TransferTableJob",oAC),interval,24*60*60,TimeUnit.SECONDS);
     }
 
     public static void main(String[] args) {
