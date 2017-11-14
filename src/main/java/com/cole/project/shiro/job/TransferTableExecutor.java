@@ -3,6 +3,7 @@ package com.cole.project.shiro.job;
 import com.cole.project.data.common.Oracle2Mysql;
 import com.cole.project.data.transferTable.model.TransferTableEntity;
 import com.cole.project.data.transferTable.service.impl.TransferTableServiceImpl;
+import com.cole.project.web.util.DateUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
@@ -35,6 +36,10 @@ public class TransferTableExecutor implements Runnable{
             transferTableService = oAC.getBean(TransferTableServiceImpl.class);
         }
         List<TransferTableEntity> list = transferTableService.getList(params);
+        String sql = " BALANCE_WATER_NO = "+ DateUtils.toString(new java.util.Date(),"yyyyMMdd")+"01";
+        for (TransferTableEntity transferTableEntity : list) {
+            transferTableEntity.setExtraSql(sql);
+        }
         try {
             Oracle2Mysql.oracle2mysql(list);
         } catch (Exception e) {

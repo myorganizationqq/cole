@@ -17,6 +17,8 @@ public class TransferTableEntity implements Serializable{
     private String extraSql;
     /*状态 0 不可用 1 可用 */
     private int stat;
+    /*查类型,用来区分不同表的不同处理*/
+    private String tableType;
 
     /*查询列个数 存变量用*/
     private int columnNum;
@@ -65,6 +67,13 @@ public class TransferTableEntity implements Serializable{
 
     public void setExtraSql(String extraSql) {
         this.extraSql = extraSql;
+    }
+    public String getTableType() {
+        return tableType;
+    }
+
+    public void setTableType(String tableType) {
+        this.tableType = tableType;
     }
 
 }

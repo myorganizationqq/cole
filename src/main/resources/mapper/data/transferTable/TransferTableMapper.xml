@@ -10,7 +10,7 @@
  
 
 <select id="getList" parameterType="java.util.Map" resultType="com.cole.project.data.transferTable.model.TransferTableEntity">
-	select IMP_TABLE_NAME impTableName,EXP_TABLE_NAME expTableName,TABLE_COLUMN tableColumn,EXTRA_SQL extraSql,STAT stat from transfer_table
+	select IMP_TABLE_NAME impTableName,EXP_TABLE_NAME expTableName,TABLE_COLUMN tableColumn,EXTRA_SQL extraSql,STAT stat,TABLE_TYPE tableType from transfer_table
 	<where>
 		<if test="impTableName != null">
 			and IMP_TABLE_NAME like CONCAT('%',#{impTableName},'%')
@@ -21,6 +21,10 @@
 		<if test="stat != null">
 			and stat = #{stat}
 		</if>
+		<if test="tableType != null">
+			and TABLE_TYPE = #{tableType}
+		</if>
+
 	</where>
 	order by IMP_TABLE_NAME
 </select>

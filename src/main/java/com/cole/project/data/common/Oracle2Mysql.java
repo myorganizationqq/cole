@@ -1,7 +1,7 @@
 package com.cole.project.data.common;
 
 import com.cole.project.data.transferTable.model.TransferTableEntity;
-import com.cole.project.web.util.DateUtils;
+import com.cole.project.web.util.PropertiesUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
@@ -23,10 +23,10 @@ public class Oracle2Mysql {
     public Oracle2Mysql(){
 
     }
-    public static List<List<String>> tableInput(TransferTableEntity transferTableEntity) throws FileNotFoundException,
+    public static List<List<String>> tableInput(TransferTableEntity transferTableEntity, ConnectVO oracleConnectVO) throws FileNotFoundException,
             SQLException {
         List<List<String>> findList = new ArrayList<List<String>>();
-        oracleConn = Oracle_con.createIfNon(oracleConn);
+        oracleConn = Oracle_con.createIfNon(oracleConn,oracleConnectVO);
         PreparedStatement pre = null;
         ResultSet resultSet = null;
         String sql = "SELECT "+transferTableEntity.getTableColumn()+"  FROM "+transferTableEntity.getImpTableName();
@@ -112,19 +112,18 @@ public class Oracle2Mysql {
         t.setRawOffset(0);
         sdf.setTimeZone(t);
         Long startTime = System.currentTimeMillis();
-        String sql = " BALANCE_WATER_NO = "+ DateUtils.toString(new java.util.Date(),"yyyyMMdd")+"01";
-       //String sql = " BALANCE_WATER_NO = 2017110401";
+        ConnectVO oracleConnectVO=new ConnectVO(PropertiesUtil.getValue("oracle.driverClassName"),
+                PropertiesUtil.getValue("oracle.url"),PropertiesUtil.getValue("oracle.username"),PropertiesUtil.getValue("oracle.password"));
         for (TransferTableEntity transferTable : transferTables) {
-            System.out.println(transferTable.getImpTableName()+"--------------------------------------------"+sql);
-            transferTable.setExtraSql(sql);
+            System.out.println(transferTable.getImpTableName()+"--------------------------------------------"+transferTable.getExtraSql());
             mysqlConn= Mysql_con.createIfNon(mysqlConn);
             String delSql="delete FROM "+transferTable.getExpTableName();
-            if(StringUtils.isNotBlank(sql)){
-                delSql+=" WHERE "+sql;
+            if(StringUtils.isNotBlank(transferTable.getExtraSql())){
+                delSql+=" WHERE "+transferTable.getExtraSql();
             }
             try {
                 mysqlConn.createStatement().execute(delSql);
-                List<List<String>> newDrug = tableInput(transferTable);
+                List<List<String>> newDrug = tableInput(transferTable,oracleConnectVO);
             } catch (Exception e) {
                 e.printStackTrace();
                 continue;
@@ -139,5 +138,22 @@ public class Oracle2Mysql {
 
     public static void main(String[] args) throws FileNotFoundException,
             SQLException {
+        /*ConnectVO oracleConnectVO=new ConnectVO(PropertiesUtil.getValue("oracle.driverClassName"),
+                PropertiesUtil.getValue("oracle.url"),PropertiesUtil.getValue("oracle.username"),PropertiesUtil.getValue("oracle.password"));
+        TransferTableEntity transferTable = new TransferTableEntity();
+        transferTable.setImpTableName("");
+        transferTable.setExpTableName("");
+        transferTable.setTableColumn("");
+        transferTable.setExtraSql("");
+        transferTable.setColumnNum(0);
+
+        mysqlConn= Mysql_con.createIfNon(mysqlConn);
+        //根据条件清空表,也可以不清空,看需要
+        String delSql="delete FROM "+transferTable.getExpTableName();
+        if(StringUtils.isNotBlank(transferTable.getExtraSql())){
+            delSql+=" WHERE "+transferTable.getExtraSql();
+        }
+        mysqlConn.createStatement().execute(delSql);
+        List<List<String>> newDrug = tableInput(transferTable,oracleConnectVO);*/
     }
 }
