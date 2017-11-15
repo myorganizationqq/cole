@@ -1,7 +1,7 @@
 package com.cole.project.shiro.job;
 
 import com.cole.project.data.common.Oracle2Mysql;
-import com.cole.project.data.transferTable.model.TransferTableEntity;
+import com.cole.project.data.transferTable.entity.TransferTableEntity;
 import com.cole.project.data.transferTable.service.impl.TransferTableServiceImpl;
 import com.cole.project.web.util.DateUtils;
 import org.springframework.context.ApplicationContext;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author JiangFeng
  * @date 2017/11/13
- * @deprecated 数据库传输任务的逻辑
+ * @Description 数据库传输任务的逻辑
  */
 public class TransferTableExecutor implements Runnable{
 

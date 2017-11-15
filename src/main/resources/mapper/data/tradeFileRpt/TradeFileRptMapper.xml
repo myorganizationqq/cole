@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cole.project.data.tradeFileRpt.dao.ITradeFileRptDao">
+    <resultMap id="TradeFileRptVOResult" type="com.cole.project.data.tradeFileRpt.entity.TradeFileRptVO">
+        <id property="id" column="id" javaType="long" jdbcType="INTEGER"></id>
+        <result property="balanceWaterNo" column="balance_water_no" jdbcType="VARCHAR"/>
+        <result property="fileType" column="file_type" jdbcType="VARCHAR"/>
+        <result property="fileCount" column="file_count" jdbcType="NUMERIC"/>
+        <result property="handleCount" column="handle_count" jdbcType="NUMERIC"/>
+        <result property="wrongfulCount" column="wrongful_count" jdbcType="NUMERIC"/>
+        <result property="duplicateCount" column="duplicate_count" jdbcType="NUMERIC"/>
+        <result property="noPretreatmentCount" column="no_pretreatment_count" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <!--<parameterMap id="ParamterTradeFileRptVO" type="com.cole.project.data.tradeFileRpt.entityy.TradeFileRptVO">
+
+    </parameterMap>-->
+
+    <insert id="insert" parameterType="com.cole.project.data.tradeFileRpt.entity.TradeFileRptVO">
+    insert into trade_file_rpt (id,balance_water_no,file_type,file_count,handle_count,wrongful_count,duplicate_count,no_pretreatment_count)
+    values (#{id}, #{balanceWaterNo}, #{fileType},#{fileCount}, #{handleCount}, #{wrongfulCount}, #{duplicateCount}, #{noPretreatmentCount}
+      )
+  </insert>
+
+    <insert id="insertBatch" parameterType="com.cole.project.data.tradeFileRpt.entity.TradeFileRptVO">
+        insert into trade_file_rpt
+        (id,balance_water_no,file_type,file_count,handle_count,wrongful_count,duplicate_count,no_pretreatment_count)
+        values
+        <foreach collection="list" item="item" separator="," index="index">
+            (
+            #{item.id}, #{item.balanceWaterNo}, #{item.fileType},#{item.fileCount}, #{item.handleCount},
+            #{item.wrongfulCount}, #{item.duplicateCount}, #{item.noPretreatmentCount}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="getList" parameterType="java.util.Map" resultMap="TradeFileRptVOResult">
+        select id,balance_water_no,file_type,file_count,handle_count,wrongful_count,duplicate_count,no_pretreatment_count from
+        trade_file_rpt
+        <where>
+
+            <if test="balanceWaterNo != null">
+                and balance_water_no = #{balanceWaterNo}
+            </if>
+            <if test="fileType != null">
+                and file_type = #{fileType}
+            </if>
+
+        </where>
+        order by id ASC
+    </select>
+
+    <select id="getOne" parameterType="long" resultMap="TradeFileRptVOResult">
+	    select id,balance_water_no,file_type,file_count,handle_count,wrongful_count,duplicate_count,no_pretreatment_count from trade_file_rpt WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE trade_file_rpt SET
+        balance_water_no = #{balanceWaterNo} ,
+        file_type = #{fileType} ,
+        file_count = #{fileCount} ,
+        handle_count = #{handleCount} ,
+        wrongful_count = #{wrongfulCount} ,
+        duplicate_count = #{duplicateCount} ,
+        no_pretreatment_count = #{noPretreatmentCount}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM trade_file_rpt WHERE id = #{id}
+    </delete>
+</mapper>

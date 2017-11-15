@@ -1,4 +1,4 @@
-package com.cole.project.data.transferTable.model;
+package com.cole.project.data.transferTable.entity;
 
 import java.io.Serializable;
 

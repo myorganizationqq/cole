@@ -40,11 +40,11 @@
 		<property name="numTestsPerEvictionRun" value="${dbcp.numTestsPerEvictionRun}" />
 		<property name="minEvictableIdleTimeMillis" value="${dbcp.minEvictableIdleTimeMillis}" />
 	</bean>
-	<bean id="commonTransactionManager"
+	<!--<bean id="commonTransactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="commonDataSource" />
 		<qualifier value="common"/>
-	</bean>
+	</bean>-->
 	<!-- 加载Mapper文件 -->
 	<bean id="commonSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="commonDataSource" />
@@ -67,6 +67,7 @@
 	<!--配置事务 -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="commonDataSource" />
+		<qualifier value="common"/>
 	</bean>
 
 	<aop:config proxy-target-class="true">

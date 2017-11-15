@@ -13,7 +13,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.cole.project.data.transferTable.model.TransferTableEntity;
+import com.cole.project.data.transferTable.entity.TransferTableEntity;
 import com.cole.project.web.util.PropertiesUtil;
 
 /**
